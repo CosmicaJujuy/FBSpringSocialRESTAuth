@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xsi:schemaLocation="http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+	     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+
+	<beans profile="production">
+		<jee:jndi-lookup jndi-name="jdbc/thingabled" id="dataSource"
+			expected-type="javax.sql.DataSource">
+		</jee:jndi-lookup>
+
+		<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+			<property name="entityManagerFactory" ref="entityManagerFactory" />
+		</bean>
+
+		<tx:annotation-driven />
+		<bean id="exceptionTranslator"
+			class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"></bean>
+
+		<bean id="hibernateJpaVendorAdapter"
+			class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+
+		<bean id="entityManagerFactory"
+			class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+			<property name="dataSource" ref="dataSource" />
+			<property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter" />
+			<property name="packagesToScan"
+				value="com.ozgen.server.entity" />
+			<property name="jpaProperties">
+				<props>
+					<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</prop>
+					<prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
+					<prop key="hibernate.format_sql">true</prop>
+					<prop key="hibernate.hbm2ddl.auto">validate</prop>
+					<prop key="hibernate.show_sql">false</prop>
+				</props>
+			</property>
+		</bean>
+
+		<jpa:repositories
+			base-package="com.ozgen.server.repository" />
+
+	</beans>
+
+</beans>
