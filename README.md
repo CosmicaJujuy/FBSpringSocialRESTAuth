@@ -1,5 +1,5 @@
 # FBSpringSocialRESTAuth
-Spring Authentication Filter for Stateless REST Endpoints with Facebook Tokens
+Spring Authentication Filter for Stateless REST Endpoints which use Facebook Token for authentication.
 
 We have been looking for a "Spring" solution which secures our REST backends using Facebook OAuth Token that REST clients 
 already have in hand. For example: You have a mobile app with Facebook Connect SDK implemented in the app itself and on the other hand 
