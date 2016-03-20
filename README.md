@@ -100,7 +100,7 @@ If Facebook token isvalid then the filter will try to authenticate the request v
   
     private Authentication attemptAuthService(...) {
       URIBuilder builder = URIBuilder.fromUri(String.format("%s/debug_token", "https://graph.facebook.com"));
-      builder.queryParam("access_token", "1021003461277157|_PIMOVq3X-pzRtgZ3Xj6yqF5W00");
+      builder.queryParam("access_token", "...");
       builder.queryParam("input_token", request.getParameter("input_token"));
   
       URI uri = builder.build();
