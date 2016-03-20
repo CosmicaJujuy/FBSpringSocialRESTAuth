@@ -99,33 +99,39 @@ If Facebook token isvalid then the filter will try to authenticate the request v
 
   
     private Authentication attemptAuthService(...) {
+      if (request.getParameter("input_token") == null) {
+        throw new SocialAuthenticationException("No token in the request");
+      }
       URIBuilder builder = URIBuilder.fromUri(String.format("%s/debug_token", "https://graph.facebook.com"));
-      builder.queryParam("access_token", "...");
+      builder.queryParam("access_token", access_token);
       builder.queryParam("input_token", request.getParameter("input_token"));
-  
       URI uri = builder.build();
       RestTemplate restTemplate = new RestTemplate();
-      JsonNode resp = restTemplate.getForObject(uri, JsonNode.class);
-  
+      
+      JsonNode resp = null;
+      try {
+        resp = restTemplate.getForObject(uri, JsonNode.class);
+      } catch (HttpClientErrorException e) {
+        throw new SocialAuthenticationException("Error validating token");
+      }
       Boolean isValid = resp.path("data").findValue("is_valid").asBoolean();
-  
       if (!isValid)
-          throw new SocialAuthenticationException("Token is not valid");
-  
+        throw new SocialAuthenticationException("Token is not valid");
+      
       AccessGrant accessGrant = new AccessGrant(request.getParameter("input_token"), null, null,
-              resp.path("data").findValue("expires_at").longValue());
-  
+      	resp.path("data").findValue("expires_at").longValue());
+      
       Connection<?> connection = ((OAuth2ConnectionFactory<?>) authService.getConnectionFactory())
-              .createConnection(accessGrant);
+      	.createConnection(accessGrant);
       SocialAuthenticationToken token = new SocialAuthenticationToken(connection, null);
       Assert.notNull(token.getConnection());
-  
+      
       Authentication auth = SecurityContextHolder.getContext().getAuthentication();
       if (auth == null || !auth.isAuthenticated()) {
-          return doAuthentication(authService, request, token);
+        return doAuthentication(authService, request, token);
       } else {
-          addConnection(authService, request, token);
-          return null;
+        addConnection(authService, request, token);
+        return null;
       }
     }
   
